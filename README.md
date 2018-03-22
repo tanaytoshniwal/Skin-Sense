@@ -34,6 +34,9 @@ The model is used in the app by creating ***TensorFlowImageClassifier***. When t
    The image recognition is On-device making the ***app fully function offline***.
    This helps the people to use our app even in remote areas.
 
+### Video
+<p align="center"><iframe width="560" height="315" src="https://www.youtube.com/embed/KlgGsKHPad8" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe></p>
+
 ### Links
   Check the video [here](https://drive.google.com/file/d/1RkQBlA70qvi8SBSMB2zk-3ypVpzpRCca/view?usp=drivesdk)
 
