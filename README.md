@@ -2,6 +2,11 @@
   Rajasthan Hackathon 4.0 android project.
 Skin Cancer Detection using Deep Learning.
 
+## Team Members
+  * [Tanay Toshniwal](https://github.com/AlphaBAT69)
+  * [Ritvik Jain](https://github.com/Ritvikjain)
+  * [Arnab Ray](https://github.com/arnabuchiha)
+  * [Rajnish Raj](https://github.com/ShadowRajnsih)
 
 ### Screenshots
 <p align="center">
