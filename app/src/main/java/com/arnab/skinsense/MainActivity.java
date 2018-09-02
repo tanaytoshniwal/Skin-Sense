@@ -23,6 +23,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.bumptech.glide.Glide;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.Gson;
 import com.orhanobut.hawk.Hawk;
 import com.wonderkiln.camerakit.CameraKitError;
@@ -40,6 +43,13 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity {
+    //Firebase Variables
+    private FirebaseAuth firebaseAuth;
+    private FirebaseAuth.AuthStateListener authStateListener;
+    private FirebaseDatabase firebaseDatabase;
+    private DatabaseReference databaseReference;
+
+    private String email;
 
     private static final int INPUT_SIZE = 299;
     private static final int IMAGE_MEAN = 128;
@@ -64,6 +74,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        //email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+
         setContentView(R.layout.activity_main);
         cameraView = findViewById(R.id.cameraView);
         imageViewResult = findViewById(R.id.imageViewResult);
@@ -86,7 +99,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onImage(CameraKitImage cameraKitImage) {
                 Bitmap bitmap = cameraKitImage.getBitmap();
-                String filename = "bitmap.png";
+                BitmapHelper.getInstance().setBitmap(bitmap);
+                pd.dismiss();
+                Intent intent=new Intent(MainActivity.this,Crop.class);
+                //intent.putExtra("bitmap",filename);
+                startActivityForResult(intent,2);
+                /*String filename = "bitmap.png";
 
                 try {
                     FileOutputStream stream = openFileOutput(filename, Context.MODE_PRIVATE);
@@ -104,8 +122,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 //bitmap=Bitmap.createScaledBitmap((bitmap,bitmap.getWidth(),bitmap.getHeight(),false);
                 //bitmap = Bitmap.createScaledBitmap(bitmap, INPUT_SIZE, INPUT_SIZE, false);
-
-
+                */
 
             }
 
@@ -157,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
             dialog.setCancelable(false);
             dialog.setContentView(R.layout.alert);
-            Toast.makeText(this, ""+alertimg, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, ""+alertimg, Toast.LENGTH_SHORT).show();
             //alertimg.setImageBitmap(bitmap);
             TextView text = (TextView) dialog.findViewById(R.id.text_dialog);
             text.setText(results.toString());
@@ -195,7 +212,9 @@ public class MainActivity extends AppCompatActivity {
             String bit=offline.BitMapToString(bitmap);
             UserData ud = new UserData(results.toString(),bit);
             ListHolder.list.add(ud);
-            Hawk.put("pred",ListHolder.list);
+            Hawk.put(FirebaseAuth.getInstance().getCurrentUser().getEmail(),ListHolder.list);
+            if(Hawk.contains(FirebaseAuth.getInstance().getCurrentUser().getEmail()))
+            Toast.makeText(this,Hawk.get(FirebaseAuth.getInstance().getCurrentUser().getEmail()).toString(), Toast.LENGTH_SHORT).show();
         }
     }
     @Override
@@ -250,5 +269,13 @@ public class MainActivity extends AppCompatActivity {
                 btnDetectObject.setVisibility(View.VISIBLE);
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent=new Intent(MainActivity.this,NavigationActivity.class);
+        startActivity(intent);
+        finish();
+        super.onBackPressed();
     }
 }

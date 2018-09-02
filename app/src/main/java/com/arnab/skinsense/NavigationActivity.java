@@ -1,14 +1,11 @@
 package com.arnab.skinsense;
 
-import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -41,16 +38,19 @@ public class NavigationActivity extends AppCompatActivity implements NavigationV
     private FirebaseAuth.AuthStateListener authStateListener;
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference databaseReference;
+    private String email;
     android.support.v4.app.Fragment frag;
 
-    private TextView nameofuser, emailofuser;
+    private TextView nameofuser, emailofuser, surprisetext;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        //email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+
         Hawk.init(NavigationActivity.this).setEncryption(new NoEncryption()).build();
-        if(Hawk.contains("pred")){
-            ListHolder.list=Hawk.get("pred");
+        if(Hawk.contains(FirebaseAuth.getInstance().getCurrentUser().getEmail())){
+            ListHolder.list=Hawk.get(FirebaseAuth.getInstance().getCurrentUser().getEmail());
         }
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = firebaseDatabase.getReference().child("user");
@@ -70,6 +70,12 @@ public class NavigationActivity extends AppCompatActivity implements NavigationV
         };
 
         setContentView(R.layout.activity_navigation);
+        surprisetext = findViewById(R.id.surprisetext);
+
+        if(ListHolder.list.size() == 0)
+            surprisetext.setVisibility(View.VISIBLE);
+        else
+            surprisetext.setVisibility(View.GONE);
 
         frag = new UserProfile();
         if (frag!=null)
@@ -94,7 +100,7 @@ public class NavigationActivity extends AppCompatActivity implements NavigationV
                 /*Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();*/
                 startActivity(new Intent(NavigationActivity.this, MainActivity.class));
-                Log.d("Tanay", "Detection Activity");
+                android.util.Log.d("Tanay", "Detection Activity");
                 //Toast.makeText(NavigationActivity.this, "Snap", Toast.LENGTH_SHORT).show();
             }
         });
@@ -195,6 +201,14 @@ public class NavigationActivity extends AppCompatActivity implements NavigationV
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            android.support.v4.app.Fragment fragment = new Settings();
+            FragmentManager fragmentManager=getSupportFragmentManager();
+            FragmentTransaction ft=fragmentManager.beginTransaction();
+
+            ft.replace(R.id.fragmentview,fragment);
+            ft.commit();
+        }
         if (id == R.id.action_signout) {
             firebaseAuth.signOut();
             return true;
